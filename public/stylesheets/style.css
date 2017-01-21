@@ -1,0 +1,33 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+#chart {
+  background-color: powderblue;
+  max-width: 300px;
+  }
+#delete{
+  max-width: 300px;
+}
+a:link {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: none;
+}
+.panel{
+  text-align: center;
+  margin:5px;
+}
+
+.panel:hover{
+  background: powderblue;
+}
+#new{
+  margin-top:10px;
+}
+#addOpt{
+   margin-bottom:10px;
+}
+
+

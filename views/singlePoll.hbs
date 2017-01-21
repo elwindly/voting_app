@@ -1,0 +1,35 @@
+<div class="row">
+    <div class="col-sm-6">
+        <div id="chart">
+            <canvas id="myChart" width="10" height="10"></canvas>
+        </div>
+        {{#if isOwner}}
+         <button id="delete" type="button" class="btn btn-block btn-danger" data-id="{{id}}" >Delete</button>
+         {{/if}}
+    </div>
+    <div class="col-sm-6">
+        <form id="vote">
+            <div class="form-group" id="opList">
+                <label for="options">Select the option you like{{#if isLoggedIn}}<span> or add one</span>{{/if}}:</label>
+                <select class="form-control" id="options" data-id="{{id}}">
+                    <option name="option" value="select">Select...</option>
+                    {{#each chartOptions}}
+                        <option name="option" value="{{this}}">{{this}}</option>
+                    {{/each}}
+
+                    {{#if isLoggedIn}}
+                        <option name="option" value="add">Add a new option</option>
+                    {{/if}}
+                </select>
+            </div>
+            <button id="pollButton" type="submit" class="btn btn-success disabled">Submit</button>
+        </form>       
+    </div>
+</div>
+<script>
+    var pollData = [{{{chartData}}}];
+    var rawData = "{{{chartOptions}}}";
+    var pollOptions = rawData.split(",");
+    var title = "{{{chartName}}}"
+    var pie = createChart(title,pollOptions,pollData);
+</script>
