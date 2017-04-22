@@ -115,6 +115,7 @@ router.post('/poll/:id',authenticate, (req,res)=> {
         _id: pollId
       }, {
         $push: {options:newOpt},
+        $inc: {"numVotes":1},
       }, function(err, raw) {
         if (err) return res.status(400).send();
         res.status(200).send();
