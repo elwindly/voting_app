@@ -57,8 +57,7 @@ function SinglePollController() {
             }, {
             $inc: {"options.$.voteCount": 1,"numVotes":1},
         })
-        .then(() => Poll.findById(req.id))
-        .then((doc)=> res.status(200).send(doc.options))
+        .then(()=> res.status(200).send())
         .catch((e)=> res.status(400).send());
     };
 
