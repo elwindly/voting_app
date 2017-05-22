@@ -91,9 +91,8 @@ $('#options').change(function(){
         }
         pie.update();
         ajaxRequest(`${baseUrl}/poll/${id}`, method, data, function(err, data) {
-            console.log(data);
                 if (!err) {
-                    
+
                 } else {
                     alert('Something went wrong');
                 }
