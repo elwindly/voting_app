@@ -3,18 +3,18 @@ const {ObjectID} = require('mongodb');
 const {Poll} = require('./polls');
 const user = new ObjectID();
 const user2 ="5863f9d42766682f7850c898"
-const firstPoll = new Poll({
-    title:"User 2 second testPoll",
-    options:[
-        {
-            option:"tester"
-        },
-        {
-            option:"testerin"
-        }
-    ],
-    _creator:user2
-});
+// const firstPoll = new Poll({
+//     title:"User 2 second testPoll",
+//     options:[
+//         {
+//             option:"tester"
+//         },
+//         {
+//             option:"testerin"
+//         }
+//     ],
+//     _creator:user2
+// });
 
 // firstPoll.save().then((doc)=>{
 //     console.log(doc);
@@ -46,6 +46,15 @@ const body = {
 //       if (err) return console.log(err);
 //       console.log("ok");
 //     });
+const id = "5865407c8d578438c0bd2099"
+            Poll.findOneAndUpdate( {
+                _id: id
+                }, {
+                $push: {options:{option:"Another fantastic option", voteCount:1 }},
+                $inc: {"numVotes":1},
+            }).then(() => Poll.findById(id))
+              .then((doc)=> console.log(doc))
+              .catch((e)=> console.log(e));
 
 // Poll.findOneAndUpdate( {
 //       _id: id
@@ -91,16 +100,16 @@ const body = {
 //     //doc.options.shift();
 //     doc.save();
 // });
-let id = "587695aa9098a82f8000957f";
-let creator = "tester";
+//let id = "587695aa9098a82f8000957f";
+// let creator = "tester";
 
-Poll.findOneAndRemove({
-        _id:id,
-        _creator:creator
-    }).then((poll)=>{
-        console.log(poll);
+// Poll.findOneAndRemove({
+//         _id:id,
+//         _creator:creator
+//     }).then((poll)=>{
+//         console.log(poll);
 
-    }).catch((e)=> console.log(e));
+//     }).catch((e)=> console.log(e));
 
 
 

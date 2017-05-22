@@ -1,175 +1,105 @@
-
-
-function createChart(title,labels,datapoints){
-    var ctx = $("#myChart");
-    var colorArr = [];
-    for(let i = 0; i < labels.length;i++){
-        colorArr.push(getRandomColor());
-    }
-    var myPieChart = new Chart(ctx,{
-        type: 'pie',
-        data: {
-            labels:labels,
-            datasets:[{
-                label:title,
-                data:datapoints,
-                backgroundColor:colorArr}]},
-            animation:{
-                animateScale:true
-            },
-            options:{
-                responsive:true,
-                legend:{
-                    position:"right"
-                },
-                title:{
-                    display:true,
-                    text:title
-                }
-        }
-    });
-    return myPieChart;
-}
-
-function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
 var baseUrl = location.origin;
+
 $(document).ready(function(){
 
-jQuery('#login').on('submit',function(e){
-    e.preventDefault();
-    var email = jQuery('[name=emailLog]').val();
-    var pwd = jQuery('[name=pwdLog]').val();
-    var data ={
-        emailLog:email,
-        pwdLog:pwd
-    };
-    $.ajax({
-        url: `${baseUrl}/users/login`,
-        type: 'POST',
-        data: data,
-        success: function(data, textStatus, request) {
-           $('#loginModal').modal('hide');     
-           window.location.replace('/userLogged');
-        },
-        error: function(e) {
-            console.log(e);
-            alert('"Invalid username. email or password"');
-        }
+
+ ///// User handling logic start  
+    //user login
+    jQuery('#login').on('submit', function(e){
+        e.preventDefault();
+        var data ={
+            emailLog:jQuery('[name=emailLog]').val(),
+            pwdLog:jQuery('[name=pwdLog]').val()
+        };
+        ajaxRequest(`${baseUrl}/users/login`, 'POST', data, function(err, data) {
+            if (!err) {
+                window.location.replace('/userLogged');
+            } else {
+                alert('"Invalid username. email or password"');
+            }
+        });
     });
- 
-});
 
-jQuery('#signUp').on('submit',function(e){
-    e.preventDefault();
-    var email = jQuery('[name=email]').val();
-    var pwd = jQuery('[name=password]').val();
-    var name = jQuery('[name=name]').val();
-    var data ={
-        email:email,
-        password:pwd,
-        name:name
-    };
-    $.ajax({
-        url: `${baseUrl}/users`,
-        type: 'POST',
-        data: data,
-        success: function(data, textStatus, request) {
-           $('#signUpModal').modal('hide');     
-           window.location.replace('/userLogged');
-        },
-        error: function(e) {
-            console.log(e);
-            alert("Username or email is already in use!");
-        }
+    //user signup
+    jQuery('#signUp').on('submit',function(e){
+        e.preventDefault();
+        var data ={
+            email:jQuery('[name=email]').val(),
+            password:jQuery('[name=password]').val(),
+            name:jQuery('[name=name]').val()
+        };
+        ajaxRequest(`${baseUrl}/users`, 'POST', data, function(err, data) {
+            if (!err) {
+                window.location.replace('/userLogged');
+            } else {
+                alert("Username or email is already in use!");
+            }
+        });
     });
-});
 
-
-
-jQuery('#logOut').on('click',function(e){
-    e.preventDefault();
-    $.ajax({
-        url: `${baseUrl}/users/me/token`,
-        type: 'DELETE',
-        success: function(result) {
-            window.location.replace('/');
-            alert('You succesfully logged out');
-        }
+    //user log out
+    jQuery('#logOut').on('click',function(e){
+        e.preventDefault();
+        ajaxRequest(`${baseUrl}/users/me/token`, 'DELETE', {}, function(err, data) {
+            if (!err) {
+                window.location.replace('/');
+                alert('You succesfully logged out');
+            } 
+        });
     });
-});
+ ///// User handling logic end
 
 $('#options').change(function(){
     var inp = jQuery('#options').val();
  
-    if(inp === 'add'){
+    if (inp === 'add') {
        var textInp = jQuery('<input type="text" class="form-control" id="new" autofocus>');
        jQuery('#opList').append(textInp);
        jQuery('#pollButton').removeClass('disabled');
-    }else if(inp === 'select'){
+    } else if (inp === 'select'){
         jQuery('#new').remove();
         jQuery('#pollButton').addClass('disabled');
-    }else{
+    } else {
         jQuery('#new').remove();
         jQuery('#pollButton').removeClass('disabled');
     }
-
-
 });
 
-jQuery('#vote').on('submit',function(e){
-    e.preventDefault();
-    //console.log('option',$('[name=option]').length);
-    //console.log($(this).serializeArray());
-    var inp = jQuery('#options').val();
-    var id = jQuery('#options').data('id');
 
-    if(inp === 'add'){
+    // optimist update on pie!!!
+    jQuery('#vote').on('submit',function(e){
+        e.preventDefault();
 
-        var option = jQuery('#new').val().trim();
-        if(!option || $('[name=option]').length > 9) {
-            alert("There is too many option/ You can't submit an empty field!")
-            return;
-        }
-        var data ={
-            option:option,
-            voteCount:1  
-        };
-       var method = 'POST';
-    }else{
-        var data = {inp:inp};
-        var method = 'PATCH';
-    }
-
-    $.ajax({
-        url: `${baseUrl}/poll/${id}`,
-        type: method,
-        data: data,
-        success: function(data, textStatus, request) {
-        
-            if(inp === 'add'){
-                pollData.push(1);
-                pollOptions.push(option);
-            }else{
-                var index = pollOptions.indexOf(inp);
-                pollData[index] +=1; 
+        var inp = jQuery('#options').val();
+        var id = jQuery('#options').data('id');
+        var data, method;
+        if (inp === 'add') {
+            var option = jQuery('#new').val().trim();
+            if (!option || $('[name=option]').length > 9) {
+                alert("There is too many option/ You can't submit an empty field!")
+                return;
             }
-
-           pie.update();
-        },
-        error: function(e) {
-            console.log(e);
-            alert('Somethin went wrong');
+            pollData.push(1);  
+            pollOptions.push(option);
+            data ={option:option, voteCount:1 };
+            method = 'POST';
+        } else {
+            var index = pollOptions.indexOf(inp);
+            pollData[index] +=1; 
+            var data = {inp:inp};
+            var method = 'PATCH';
         }
+        pie.update();
+        ajaxRequest(`${baseUrl}/poll/${id}`, method, data, function(err, data) {
+            console.log(data);
+                if (!err) {
+                    
+                } else {
+                    alert('Something went wrong');
+                }
+            });  
     });
- 
-});
+
     var counter = 2;
     $('#addOpt').click(function(){
 
@@ -185,21 +115,20 @@ jQuery('#vote').on('submit',function(e){
             html += '</div>'
             html += '</div>';
             
-            $('#before').before(html);
+        $('#before').before(html);
     });
+
      $('#remove').click(function(){
          if(counter < 1){
              alert('There is nothing to remove');
              return false;
-         }
-            
+         }          
             $('#option' + counter).remove();
             counter--;
     });
 
     jQuery('#newPoll').on('submit',function(e){
         e.preventDefault();
-        //console.log($(this).serializeArray());
         var data = $(this).serializeArray();
         if(data.length < 3){
             alert("You must provide at least 2 options");
@@ -211,21 +140,13 @@ jQuery('#vote').on('submit',function(e){
                 return false;
             }
         }
-        //$.each($(this).serializeArray())
-        $.ajax({
-            url: `${baseUrl}/userLogged/newPoll`,
-            type: 'POST',
-            data: data,
-            success: function(data, textStatus, request) {
+        ajaxRequest(`${baseUrl}/userLogged/newPoll`, 'POST', data, function(err, data) {
+            if (!err) {
                 window.location.replace('/poll/' +data._id);
-
-            },
-            error: function(e) {
-                console.log(e);
+            } else {
                 alert('Something went wrong');
             }
-            });
-    
+        });   
     });
 
     jQuery('#delete').on('click',function(e){
@@ -235,19 +156,14 @@ jQuery('#vote').on('submit',function(e){
             return;
         }
         var id = jQuery('#delete').data('id');
-        console.log(id);
-        $.ajax({
-            url: `${baseUrl}/poll/${id}`,
-            type: 'DELETE',
-            success: function(data, textStatus, request) {
-                window.location.replace('/userLogged');
 
-            },
-            error: function(e) {
+        ajaxRequest(`${baseUrl}/poll/${id}`, 'DELETE', {}, function(err, data) {
+            if (!err) {
+                window.location.replace('/userLogged');
+            } else {
                 alert('Something went wrong');
             }
-            });
-    
+        });   
     });
 });
 
