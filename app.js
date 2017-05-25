@@ -5,6 +5,7 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const expressValidator = require('express-validator');
 const hbs = require('hbs')
 const {mongoose} = require('./db/mongoose');
 const MongoStore = require('connect-mongo')(session);
@@ -25,6 +26,8 @@ hbs.registerPartials(__dirname + '/views/partials')
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(expressValidator());
+
 app.use(session({
     secret: 'yoursecret',
     resave: true,
@@ -32,6 +35,13 @@ app.use(session({
     store: new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 
+
+
+app.use((req, res, next) => {
+
+  res.locals.user =  req.session.name;
+  next();
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 

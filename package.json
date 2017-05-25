@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "watch": "nodemon --exec \"node ./bin/www\""
   },
   "dependencies": {
     "bcryptjs": "^2.3.0",
@@ -12,7 +13,9 @@
     "crypto-js": "^3.1.8",
     "debug": "~2.2.0",
     "express": "~4.14.0",
+    "express-flash": "0.0.2",
     "express-session": "^1.14.2",
+    "express-validator": "^3.2.0",
     "hbs": "^4.0.1",
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.17.2",
@@ -21,5 +24,8 @@
     "morgan": "~1.7.0",
     "serve-favicon": "~2.3.0",
     "validator": "^6.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }

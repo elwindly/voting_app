@@ -4,6 +4,27 @@ $(document).ready(function(){
 
 
  ///// User handling logic start  
+
+    //modal handling
+
+    $('#loginModal').modal({ backdrop: 'static', keyboard: false, show: false });
+    $('#signUpModal').modal({ backdrop: 'static', keyboard: false, show: false });
+
+
+    $('#loginModal').on('hide.bs.modal', function () {
+        $('#loginError').empty();
+        jQuery('[name=emailLog]').val('');
+        jQuery('[name=pwdLog]').val('');
+    })
+
+    $('#signUpModal').on('hide.bs.modal', function () {
+        $('#signUpError').empty();
+        jQuery('[name=email]').val('');
+        jQuery('[name=password]').val('');
+        jQuery('[name=name]').val('');
+    })
+
+
     //user login
     jQuery('#login').on('submit', function(e){
         e.preventDefault();
@@ -15,7 +36,7 @@ $(document).ready(function(){
             if (!err) {
                 window.location.replace('/userLogged');
             } else {
-                alert('"Invalid username. email or password"');
+                addWarning('#loginError', "Invalid Credentials");    
             }
         });
     });
@@ -32,7 +53,7 @@ $(document).ready(function(){
             if (!err) {
                 window.location.replace('/userLogged');
             } else {
-                alert("Username or email is already in use!");
+                addWarning('#signUpError', err.responseText);
             }
         });
     });
@@ -43,11 +64,23 @@ $(document).ready(function(){
         ajaxRequest(`${baseUrl}/users/me/token`, 'DELETE', {}, function(err, data) {
             if (!err) {
                 window.location.replace('/');
-                alert('You succesfully logged out');
             } 
         });
     });
  ///// User handling logic end
+
+
+function addWarning(selector, message) {
+    $(selector).html('');
+    var html = 
+        `
+        <div class="alert alert-warning alert-dismissable fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>${message}</strong> 
+        </div>               
+       `;
+         $(selector).append(html);
+}
 
 $('#options').change(function(){
     var inp = jQuery('#options').val();
@@ -75,8 +108,11 @@ $('#options').change(function(){
         var data, method;
         if (inp === 'add') {
             var option = jQuery('#new').val().trim();
-            if (!option || $('[name=option]').length > 9) {
-                alert("There is too many option/ You can't submit an empty field!")
+            if (!option) {
+                 addWarning("#singlePollWarnings", "You can't submit an empty field!")
+                return;
+            } else if($('[name=option]').length > 9) {
+                addWarning("#singlePollWarnings", "There is too many option");
                 return;
             }
             pollData.push(1);  
@@ -94,7 +130,7 @@ $('#options').change(function(){
                 if (!err) {
 
                 } else {
-                    alert('Something went wrong');
+                    addWarning("#singlePollWarnings", "Cannot reach the server, try later!");
                 }
             });  
     });
@@ -103,7 +139,7 @@ $('#options').change(function(){
     $('#addOpt').click(function(){
 
         if(counter >= 10){
-            alert('Only 10 option allowed');
+            addWarning("#createPollWarnings", 'Only 10 option allowed');
             return false;
         }
         counter++;
@@ -118,8 +154,8 @@ $('#options').change(function(){
     });
 
      $('#remove').click(function(){
-         if(counter < 1){
-             alert('There is nothing to remove');
+         if(counter < 3){
+             addWarning("#createPollWarnings", 'You need to add at least 2 options to create a poll!');
              return false;
          }          
             $('#option' + counter).remove();
@@ -130,12 +166,12 @@ $('#options').change(function(){
         e.preventDefault();
         var data = $(this).serializeArray();
         if(data.length < 3){
-            alert("You must provide at least 2 options");
+            addWarning("#createPollWarnings", 'You need to add at least 2 options to create a poll!');
             return false;
         }
         for(let i = 0; i < data.length;i++){
             if(data[i].value == ''){
-                alert("You cannot have empty fields");
+                addWarning("#createPollWarnings", 'You cannot have empty fields!');
                 return false;
             }
         }
@@ -143,7 +179,7 @@ $('#options').change(function(){
             if (!err) {
                 window.location.replace('/poll/' +data._id);
             } else {
-                alert('Something went wrong');
+                addWarning("#createPollWarnings", 'Cannot reach server try again later!');
             }
         });   
     });
@@ -160,7 +196,7 @@ $('#options').change(function(){
             if (!err) {
                 window.location.replace('/userLogged');
             } else {
-                alert('Something went wrong');
+                addWarning("#singlePollWarnings", 'Cannot reach server try again later!');
             }
         });   
     });

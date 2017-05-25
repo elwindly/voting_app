@@ -8,13 +8,18 @@ const {authenticate} = require('./../middleware/authenticate');
 const SinglePollController = require('./../controllers/singlePollController');
 const NewPollController = require('./../controllers/newPollController');
 const ShowPollsController = require('./../controllers/showPollsController');
+const CommonController = require('./../controllers/commonController');
 
 const singlePollController = new SinglePollController();
 const newPollController = new NewPollController();
 const showPollsController = new ShowPollsController();
+const commonController = new CommonController();
 
 /* GET home page. */
-router.get('/', showPollsController.showPolls);
+router.get('/', commonController.welcome);
+
+//get all polls
+router.get('/allpolls', showPollsController.showPolls);
 
 // User route after login
 router.get('/userLogged',authenticate, showPollsController.showUserPolls);
