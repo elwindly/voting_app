@@ -30,7 +30,7 @@ router.post('/', (req,res)=> {
                     req.session.name = body.name;
                     res.status(200).send();
                 }).catch((e)=>{
-                    res.status(400).send(e)
+                    res.status(400).send('Invalid data!');
                 });
             }       
         });
